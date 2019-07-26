@@ -1,0 +1,27 @@
+---
+title: "Week7"
+author: "Sai Krishna Veerepalli Venkata"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 7
+
+```{r}
+with(faithful, plot(eruptions, waiting)) # Visualize plot on a screen
+title(main = "Old Faithful Geyser data")  # Title for the visualization
+pdf(file = "myplot.pdf")  # Creating a pdf file
+with(faithful, plot(eruptions, waiting))   # Creating the visualization inside the pdf
+ title(main = "Old Faithful Geyser data")   # adding a title to the visualization in the pdf
+ dev.off() # Closing the pdf file
+ library(datasets)
+ 
+ with(faithful, plot(eruptions, waiting))   # Creating a visualization with faithful data
+ title(main = "Old Faithful Geyser data") #Title for the visualization
+ dev.copy(png, file = "geyserplot.png") # Copying the visualization 
+ dev.off() # Closing the png file
+```
+

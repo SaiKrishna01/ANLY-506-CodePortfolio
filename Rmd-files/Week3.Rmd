@@ -1,0 +1,114 @@
+---
+title: "Week 3"
+author: "Sai"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Week3
+
+```{r}
+## Reading ozone dataset from csv file
+ozoneData = read.csv("/Users/sveerepalli/Downloads/US EPA data 2017 (1).csv")
+
+## Removing white spaces
+names(ozoneData) <- make.names(names(ozoneData))
+
+## Printing number of rows
+nrow(ozoneData)
+
+## Printing number of columns
+ncol(ozoneData)
+
+## Get insight on metadata of the dataset
+str(ozoneData)
+
+## Top and bottom 5 rows of the data 
+head(ozoneData)
+
+tail(ozoneData)
+ 
+## Creating a table with the site numbers where the recording of data is done
+
+table(ozoneData$Site.Num)
+
+## StateCode,CountyCode, Year and ObservationPercent for the list of recordings done at site "1003"
+
+library(dplyr)
+filter(ozoneData,Site.Num == "1003") %>% 
+         select(State.Code, County.Code, Year, 
+              Site.Num, Observation.Percent)
+
+
+## LocalSiteName,Year,State.Code ObservationCount,CompletenessIndicator,StateName and CountyName for the recordings at county Code 49 
+
+
+filter(ozoneData,County.Code == "49") %>% select(County.Code,Local.Site.Name, Year,State.Code, Observation.Count, Completeness.Indicator, State.Name, County.Name) %>% as.data.frame
+
+
+## Extracting number of unique state names
+
+select(ozoneData, State.Name) %>% unique %>% nrow()
+
+## Unique state name values
+
+unique(ozoneData$State.Name)
+
+## Extracting the summary of Observation Count
+
+summary(ozoneData$Observation.Count)
+
+
+## More information on the observation count data using quantile
+quantile(ozoneData$Observation.Count, seq(0,1,0.1))
+
+
+## Mean observation counts at county ,state level
+
+ranking <- group_by(ozoneData, State.Name, County.Name) %>%
+         summarize(observationCount = mean(Observation.Count)) %>%
+         as.data.frame %>%
+         arrange(desc(observationCount))
+
+## Top ten counties with state names with mean observations
+head(ranking, 10)
+
+
+## Bottom ten counties with state names with mean observations
+tail(ranking,10)
+
+## Number of entries from Mariposa county of California
+
+ filter(ozoneData, State.Name == "California" & County.Name == "Mariposa") %>% nrow
+ ozone <- mutate(ozoneData, Date.of.Last.Change = as.Date(Date.of.Last.Change))
+ 
+ 
+## Months with observation count in descending order
+ 
+ filter(ozone, State.Name == "California" & County.Name == "Mariposa") %>%
+         mutate(month = factor(months(Date.of.Last.Change), levels = month.name)) %>%
+         group_by(month) %>%
+   summarize(obsCount = mean(Observation.Count))
+ 
+## Challenging the dataset
+ 
+set.seed(10234)
+N <- nrow(ozoneData)
+idx <- sample(N,N,replace = TRUE)
+ozone2 <- ozoneData[idx,]
+
+ ranking2 <- group_by(ozone2, State.Name, County.Name) %>%
+         summarize(obsCount = mean(Observation.Count)) %>%
+         as.data.frame %>%
+         arrange(desc(obsCount))
+ 
+ 
+cbind(head(ranking, 10),
+      head(ranking2, 10))
+
+ cbind(tail(ranking, 10),
+       tail(ranking2, 10))
+```

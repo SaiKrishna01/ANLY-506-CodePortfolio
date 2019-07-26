@@ -1,0 +1,115 @@
+---
+title: "Week6"
+author: "Sai Krishna Veerepalli Venkata"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Week 6
+```{r}
+library(nycflights13)
+library(tidyverse)
+
+flights
+
+# dplyr
+
+## Filter - to filter the data based on conditions
+filter(flights, month == 1, day == 1) # Lists all the flights on Jan 1st
+
+jan1 <- filter(flights, month == 1, day == 1) # Stores the values in Jan1 dataset
+
+(dec25 <- filter(flights, month == 12, day == 25)) # THis will both print and store values in the dec25 data set
+
+#filter(flights, month = 1) # This will fail as equal to operator needs ==
+sqrt(2) ^ 2 == 2 # Though sqrt of 2^2 is 2 this comes as false as computer uses finite precision arithmetic
+
+near(sqrt(2) ^ 2,  2) # Near function helps to overcome that near precision arithmetic
+
+## Logical operators
+filter(flights, month == 11 | month == 12) # Flights for Nov or Dec
+nov_dec <- filter(flights, month %in% c(11, 12)) # This is also another usecase where month is a value in the vector of values 11 and 12
+
+filter(flights, !(arr_delay > 120 | dep_delay > 120)) # This will give the flights whose arrival or departure delay is not greater than 120 mins
+filter(flights, arr_delay <= 120, dep_delay <= 120) # This is also another way of representing the above condition
+
+## Missing values
+
+# logical operations on top of NA values returns a NA value
+NA >5
+NA == NA
+NA/2
+x <- NA
+y <- NA
+x==y
+
+is.na(x) # Validates if a value is NA
+
+df <- tibble(x = c(1, NA, 3))
+filter(df,x >1) # This would only return the values that are TRUE it would exclude values that are FALSE and NA
+filter(df, is.na(x) | x > 1) # This will retunr NA value as we are asking for it and the values where x is greater than 1
+
+
+# Arrange
+arrange(flights, year, month, day) # Groups the data by the column names mentioned 
+arrange(flights, desc(dep_delay)) # Re order a column in descending order
+df <- tibble(x = c(5, 2, NA))
+arrange(df, x) # Missing values are represneted in the END
+arrange(df, desc(x)) # NA is stored in the end as missing values are always store in the end
+
+
+# Select
+
+select(flights, year, month, day) # Narrow down the data to the set of columns selected
+select(flights, year:day) # Selecting all the columns between year and day columns
+select(flights, -(year:day)) # Prints all the columns excluding the columns between year and day
+
+rename(flights, tail_num = tailnum) # Renaming the column name
+select(flights, time_hour, air_time, everything()) # Helps to move the columns to beginning of the data set result
+
+# Adding new variables with mutate
+flights_sml <- select(flights, 
+  year:day, 
+  ends_with("delay"), 
+  distance, 
+  air_time
+) # Narrowing down the number of columns to a few so we can see the results after mutate
+
+mutate(flights_sml,
+  gain = dep_delay - arr_delay,
+  speed = distance / air_time * 60
+) # Adding three new columns to the data set using mutate
+
+mutate(flights_sml,
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours
+) # Mutate on top the columns that were just added
+
+transmute(flights,
+  gain = dep_delay - arr_delay,
+  hours = air_time / 60,
+  gain_per_hour = gain / hours
+) # If we want to restore only the newly added values
+
+
+# Summarise
+
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE)) # Collapsing the data to a single row
+by_day <- group_by(flights, year, month, day) # Grouping the data by date
+summarise(by_day, delay = mean(dep_delay, na.rm = TRUE)) # Its the same operation but the result is returned per date insted of a single row for the whole data
+
+
+
+
+
+
+
+
+
+
+```
+
